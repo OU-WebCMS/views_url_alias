@@ -1,0 +1,78 @@
+<?php
+/**
+ * @file
+ * Allows node related Views be filtered by path aliases.
+ */
+
+
+/**
+ * Implementation of hook_menu().
+ */
+function views_url_alias_node_menu() {
+  $items['admin/build/views/tools/alias/node'] = array(
+    'title' => 'Alias node',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('views_url_alias_node_admin'),
+    'access arguments' => array('administer views'),
+    'file' => 'views_url_alias_node.admin.inc',
+    'file path' => drupal_get_path('module', 'views_url_alias_node'),
+    'type' => MENU_LOCAL_TASK
+  );
+
+  return $items;
+}
+/**
+ * Implementation of hook_nodeapi().
+ */
+function views_url_alias_node_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
+  switch ($op) {
+    case 'insert':
+    case 'update':
+
+      db_query('DELETE FROM {views_url_alias_node} WHERE nid=%d', $node->nid);
+      if (!empty($node->path)) {
+        db_query("INSERT INTO {views_url_alias_node} (dst, nid) VALUE ('%s', %d)", $node->path, $node->nid);
+      }
+      return;
+
+    case 'delete':
+
+      db_query('DELETE FROM {views_url_alias_node} WHERE nid=%d', $node->nid);
+      return;
+
+    default:
+      return;
+  }
+}
+
+/**
+ * Implementation of hook_views_api().
+ */
+function views_url_alias_node_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'views_url_alias_node'),
+  );
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Utility functions
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Rebuild view_url_alias_node table.
+ *
+ * This function typically only need to called when this module is installed.
+ */
+function views_url_alias_node_rebuild() {
+  // Purge view_url_alias_node table.
+  db_query("DELETE FROM {views_url_alias_node}");
+
+  // Populate view_url_alias_node table.
+  db_query("INSERT INTO {views_url_alias_node} (nid, dst)
+    SELECT n.nid, ua.dst FROM {url_alias} ua INNER JOIN node AS n ON CONCAT('node/', n.nid) = ua.src WHERE ua.language=''");
+
+  // Display message
+  drupal_set_message( t('The %table table has been successfully rebuilt.', array('%table' => 'views_url_alias_node')) );
+}
