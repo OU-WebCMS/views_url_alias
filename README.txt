@@ -12,7 +12,7 @@ CONTENTS OF THIS FILE
 INTRODUCTION
 ------------
 
-The 'Views URL alias' module allows views be filtered by path aliases.
+The 'Views URL alias' module allows views to be filtered by path aliases.
 
 This module is useful if your website uses heirachical paths. It allows you to
 filter and sort a view by URL aliases. When combined with the

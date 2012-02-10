@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Allows node related Views be filtered by path aliases.
+ * Allows node related Views to be filtered by path aliases.
  */
 
 
