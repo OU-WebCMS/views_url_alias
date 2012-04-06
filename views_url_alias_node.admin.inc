@@ -12,18 +12,19 @@
  */
 function views_url_alias_node_admin() {
   $form = array();
-  $form['reset'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Rebuild Views URL alias node table'),
-    '#description' => t('This should only be needed if URL aliases have been updated outside the node or URL alias edit form.'),
+  return confirm_form($form,
+    t('Are you sure you want to rebuild the Views URL alias node table?'),
+    'admin/structure/views/settings',
+    t('This should only be needed if URL aliases have been updated outside the node or URL alias edit form.'),
+    t('Rebuild table')
   );
-  $form['reset']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Rebuild table'),
-  );
-  return $form;
 }
 
+/**
+ * Submit callback for Views URL Alias admin form.
+ */
 function views_url_alias_node_admin_submit() {
-  views_url_alias_node_rebuild();
+  _views_url_alias_node_rebuild();
+  
+  drupal_goto('admin/structure/views/settings');
 }

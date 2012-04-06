@@ -1,6 +1,6 @@
-name = Views URL alias node
-description = Allows node related Views be filtered by path aliases.
-core = 6.x
+name = Views URL alias (Node)
+description = Allows node-related Views be filtered by path aliases.
+core = 7.x
 package = Views
 dependencies[] = path
 dependencies[] = views

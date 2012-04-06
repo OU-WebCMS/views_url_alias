@@ -1,47 +1,56 @@
 <?php
+
 /**
  * @file
- * Allows node related Views to be filtered by path aliases.
+ * Allows node-related Views to be filtered by path aliases.
  */
-
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function views_url_alias_node_menu() {
-  $items['admin/build/views/tools/alias/node'] = array(
-    'title' => 'Alias node',
+  $items['admin/structure/views/settings/alias/node'] = array(
+    'title' => 'Rebuild alias node table',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('views_url_alias_node_admin'),
     'access arguments' => array('administer views'),
     'file' => 'views_url_alias_node.admin.inc',
     'file path' => drupal_get_path('module', 'views_url_alias_node'),
-    'type' => MENU_LOCAL_TASK
+    'type' => MENU_LOCAL_TASK,
   );
 
   return $items;
 }
+
 /**
- * Implementation of hook_nodeapi().
+ * Implements hook_node_insert().
  */
-function views_url_alias_node_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
-  switch ($op) {
-    case 'insert':
-    case 'update':
+function views_url_alias_node_insert($node) {
+  _views_url_alias_update_node($node);
+}
 
-      db_query('DELETE FROM {views_url_alias_node} WHERE nid=%d', $node->nid);
-      if (!empty($node->path)) {
-        db_query("INSERT INTO {views_url_alias_node} (dst, nid) VALUE ('%s', %d)", $node->path, $node->nid);
-      }
-      return;
+/**
+ * Implements hook_node_update().
+ */
+function views_url_alias_node_update($node) {
+  _views_url_alias_update_node($node);
+}
 
-    case 'delete':
+/**
+ * Implements hook_node_delete().
+ */
+function views_url_alias_node_delete($node) {
+  _views_url_alias_update_node($node, TRUE);
+}
 
-      db_query('DELETE FROM {views_url_alias_node} WHERE nid=%d', $node->nid);
-      return;
+/**
+ * Update node's alias entries.
+ */
+function _views_url_alias_update_node($node, $delete = FALSE) {
+  db_query('DELETE FROM {views_url_alias_node} WHERE nid=%d', $node->nid);
 
-    default:
-      return;
+  if (!empty($node->path) && !$delete) {
+    db_query("INSERT INTO {views_url_alias_node} (dst, nid) VALUE ('%s', %d)", $node->path, $node->nid);
   }
 }
 
@@ -50,28 +59,24 @@ function views_url_alias_node_nodeapi(&$node, $op, $teaser = NULL, $page = NULL)
  */
 function views_url_alias_node_views_api() {
   return array(
-    'api' => 2,
+    'api' => 3,
     'path' => drupal_get_path('module', 'views_url_alias_node'),
   );
 }
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Utility functions
-////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Rebuild view_url_alias_node table.
  *
  * This function typically only need to called when this module is installed.
  */
-function views_url_alias_node_rebuild() {
+function _views_url_alias_node_rebuild() {
   // Purge view_url_alias_node table.
-  db_query("DELETE FROM {views_url_alias_node}");
+  db_truncate('views_url_alias_node')->execute();
 
   // Populate view_url_alias_node table.
-  db_query("INSERT INTO {views_url_alias_node} (nid, dst)
-    SELECT n.nid, ua.dst FROM {url_alias} ua INNER JOIN node AS n ON CONCAT('node/', n.nid) = ua.src WHERE ua.language=''");
+  // @TODO Convert to D7 DBTNG somehow?
+  db_query("INSERT INTO {views_url_alias_node} (nid, alias)
+    SELECT n.nid, ua.alias FROM {url_alias} ua INNER JOIN node AS n ON CONCAT('node/', n.nid) = ua.source");
 
   // Display message
   drupal_set_message( t('The %table table has been successfully rebuilt.', array('%table' => 'views_url_alias_node')) );

@@ -1,22 +1,24 @@
 <?php
+
 /**
  * @file
- * Provide views data and handler information for views_url_alias.module.
+ * Provide views data and handler information for Views URL alias (node) module.
  */
 
 /**
- * Implementation of hook_views_data().
- *
- * Based on code from node_views_data() in view/modules/node.views.inc.
+ * Implements hook_views_data().
  */
 function views_url_alias_node_views_data() {
-  // ----------------------------------------------------------------
-  // views_url_alias_node -- basic table information.
-
   // Define table group
-  $data['views_url_alias_node']['table']['group'] = 'Node';
+  $data['views_url_alias_node']['table']['group'] = t('Content');
 
-  // Explain how this table joins to others.
+  $data['views_url_alias_node']['table']['base'] = array(
+    'field' => 'nid',
+    'title' => t('URL alias'),
+    'help' => t('Mapping table contains node IDs and their associated path aliases.'),
+    'weight' => -10,
+  );
+
   $data['views_url_alias_node']['table']['join'] = array(
     'node' => array(
       'left_field' => 'nid',
@@ -24,11 +26,7 @@ function views_url_alias_node_views_data() {
     ),
   );
 
-  // ----------------------------------------------------------------
-  // node table -- fields
-
-  // dst
-  $data['views_url_alias_node']['dst'] = array(
+  $data['views_url_alias_node']['alias'] = array(
     'title' => t('URL alias'),
     'help' => t('The alias for a node.'),
     'field' => array(
