@@ -9,6 +9,7 @@ CONTENTS OF THIS FILE
  * Notes
  * Todo
 
+
 INTRODUCTION
 ------------
 
@@ -26,7 +27,7 @@ Currently, only node aliases are supported.
 REQUIREMENTS
 ------------
 
-- Views 2.x: Create customized lists and queries from your database.
+- Views 2.x or 3.x: Create customized lists and queries from your database.
   http://drupal.org/project/views
 
 
@@ -40,7 +41,7 @@ INSTALLATION
    'Administer > Site building > Module'.
    (admin/build/modules)
 
-3. Create or view and select URL alias for the field or filter
+3. Create or view and select 'Node: URL alias' for the field or filter
 
 
 RELATED ISSUES
@@ -65,7 +66,7 @@ NOTES
 TODO
 ----
 
-- Support multiple path alias languages, which I have not experience doing.
+- Support multiple path alias languages, which I have no experience doing.
 
 - Add support for taxonomy terms, users, etc URL aliases.
 

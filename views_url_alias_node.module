@@ -6,46 +6,6 @@
 
 
 /**
- * Implementation of hook_menu().
- */
-function views_url_alias_node_menu() {
-  $items['admin/build/views/tools/alias/node'] = array(
-    'title' => 'Alias node',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('views_url_alias_node_admin'),
-    'access arguments' => array('administer views'),
-    'file' => 'views_url_alias_node.admin.inc',
-    'file path' => drupal_get_path('module', 'views_url_alias_node'),
-    'type' => MENU_LOCAL_TASK
-  );
-
-  return $items;
-}
-/**
- * Implementation of hook_nodeapi().
- */
-function views_url_alias_node_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
-  switch ($op) {
-    case 'insert':
-    case 'update':
-
-      db_query('DELETE FROM {views_url_alias_node} WHERE nid=%d', $node->nid);
-      if (!empty($node->path)) {
-        db_query("INSERT INTO {views_url_alias_node} (dst, nid) VALUE ('%s', %d)", $node->path, $node->nid);
-      }
-      return;
-
-    case 'delete':
-
-      db_query('DELETE FROM {views_url_alias_node} WHERE nid=%d', $node->nid);
-      return;
-
-    default:
-      return;
-  }
-}
-
-/**
  * Implementation of hook_views_api().
  */
 function views_url_alias_node_views_api() {
@@ -55,19 +15,119 @@ function views_url_alias_node_views_api() {
   );
 }
 
+/**
+ * Implementation of hook_menu().
+ */
+function views_url_alias_node_menu() {
+  $items['admin/build/views/tools/alias/node'] = array(
+    'title' => 'Rebuild alias node table',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('views_url_alias_node_admin'),
+    'access arguments' => array('administer views'),
+    'file' => 'views_url_alias_node.admin.inc',
+    'file path' => drupal_get_path('module', 'views_url_alias_node'),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
-// Utility functions
+// Pathauto hooks
 ////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Implementation of hook_pathauto_alias_alter().
+ */
+function views_url_alias_node_pathauto_alias_alter(&$alias, array $context) {
+  // Save node alias during bulk update.
+  if ($context['module'] == 'node'
+    && $context['op'] == 'bulkupdate'
+    && preg_match('#^node/(\d+)$#', $context['source'], $match)
+  ) {
+    $nid = $match[1];
+    views_url_alias_node_save($nid, $alias);
+  }
+}
+
+/**
+ * Implementation of hook_form_FORM_ID_alter().
+ */
+function views_url_alias_node_form_pathauto_admin_delete_alter(&$form, &$form_state) {
+  $form['#submit'][] = 'views_url_alias_node_form_pathauto_admin_delete_submit';
+}
+
+/**
+ * Submit processing for bulk delete of aliases.
+ */
+function views_url_alias_node_form_pathauto_admin_delete_submit(&$form, &$form_state) {
+  // Purge view_url_alias_node table if delete all or node alises is requested.
+  if ($form_state['values']['all_aliases'] ||  $form_state['values']['node/']) {
+    db_query("TRUNCATE TABLE {views_url_alias_node}");
+  }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Node hooks
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function views_url_alias_node_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
+  switch ($op) {
+    case 'insert':
+    case 'update':
+
+      $alias = (isset($node->path)) ? $node->path : NULL;
+      views_url_alias_node_save($node->nid, $alias);
+      return;
+
+    case 'delete':
+
+      views_url_alias_node_delete($node->nid);
+      return;
+
+    default:
+      return;
+  }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// API functions
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Save node URL alias.
+ */
+function views_url_alias_node_save($nid, $alias = NULL) {
+  db_query('DELETE FROM {views_url_alias_node} WHERE nid=%d', $nid);
+
+  if (empty($alias)) {
+    return;
+  }
+
+  db_query("INSERT INTO {views_url_alias_node} (nid, dst) VALUE (%d, '%s')", $nid, $alias);
+}
+
+/**
+ * Delete's node URL alias.
+ */
+function views_url_alias_node_delete($nid) {
+  views_url_alias_node_save($nid);
+}
 
 /**
  * Rebuild view_url_alias_node table.
  *
- * This function typically only need to called when this module is installed.
+ * This function typically only needs to be called when this module is installed.
  */
 function views_url_alias_node_rebuild() {
   // Purge view_url_alias_node table.
-  db_query("DELETE FROM {views_url_alias_node}");
+  db_query("TRUNCATE TABLE {views_url_alias_node}");
 
   // Populate view_url_alias_node table.
   db_query("INSERT INTO {views_url_alias_node} (nid, dst)

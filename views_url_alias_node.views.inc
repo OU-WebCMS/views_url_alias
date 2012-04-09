@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Provide views data and handler information for views_url_alias.module.
+ * Provide views data and handler information for Views URL alias (node) module.
  */
 
 /**

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Installation information for the 'Views URL alias' module.
+ * Installation information for the Views URL alias (node) module.
  */
 
 module_load_include('module', 'views_url_alias');
