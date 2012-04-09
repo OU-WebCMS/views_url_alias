@@ -24,7 +24,7 @@ function views_url_alias_node_admin() {
  * Submit callback for Views URL Alias admin form.
  */
 function views_url_alias_node_admin_submit() {
-  _views_url_alias_node_rebuild();
-  
+  views_url_alias_node_rebuild();
+
   drupal_goto('admin/structure/views/settings');
 }

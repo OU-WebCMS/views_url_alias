@@ -10,7 +10,7 @@
  */
 function views_url_alias_node_views_data() {
   // Define table group
-  $data['views_url_alias_node']['table']['group'] = t('Content');
+  $data['views_url_alias_node']['table']['group'] = t('Node');
 
   $data['views_url_alias_node']['table']['base'] = array(
     'field' => 'nid',

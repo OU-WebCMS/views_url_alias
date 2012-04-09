@@ -11,7 +11,7 @@
 function views_url_alias_node_enable() {
   module_load_include('module', 'views_url_alias');
 
-  _views_url_alias_node_rebuild();
+  views_url_alias_node_rebuild();
 }
 
 /**
