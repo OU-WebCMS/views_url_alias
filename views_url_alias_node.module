@@ -78,7 +78,7 @@ function views_url_alias_node_form_pathauto_admin_delete_submit(&$form, &$form_s
  * Implements hook_node_insert().
  */
 function views_url_alias_node_node_insert($node) {
-  views_url_alias_node_update($node);
+  views_url_alias_node_node_update($node);
 }
 
 /**
