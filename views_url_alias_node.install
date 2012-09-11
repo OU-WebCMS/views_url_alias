@@ -4,7 +4,6 @@
  * Installation information for the Views URL alias (node) module.
  */
 
-module_load_include('module', 'views_url_alias');
 
 /**
  * Implementation of hook_enable().
