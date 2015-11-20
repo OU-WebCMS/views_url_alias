@@ -47,14 +47,25 @@ function views_url_alias_node_schema() {
           'default' => ''
         ),
       ),
-      'unique keys' => array('nid_alias' => array('nid', 'alias')),
+      'index' => array(
+        'nid' => array('nid'),
+        'nid_alias' => array('nid', 'alias')),
       'foreign keys' => array(
         'nid' => array(
           'table' => 'node',
           'columns' => array('nid' => 'nid'),
         ),
       ),
-      'primary key' => array('nid'),
     ),
   );
+}
+
+/**
+ * Allow duplicate values for nid and nid_alias indexes.
+ */
+function views_url_alias_node_update_7001() {
+  db_drop_primary_key('views_url_alias_node', 'nid');
+  db_add_index(       'views_url_alias_node', 'nid', array('nid'));
+  db_drop_unique_key('views_url_alias_node', 'nid_alias');
+  db_add_index(      'views_url_alias_node', 'nid_alias', array('nid', 'alias'));
 }
