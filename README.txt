@@ -20,16 +20,16 @@ Views bulk operation (VBO) module (http://drupal.org/project/views_bulk_operatio
 you can apply operations to a specific section of your website based on a
 URL alias.
 
-Currently, only node aliases are supported.
+All content entities aliases are supported.
 
 
 INSTALLATION
 ------------
 
-1. Copy/upload the view_url_alias_node.module to the modules directory
+1. Copy/upload the view_url_alias.module to the modules directory
    of your Drupal installation.
 
-2. Enable the 'Views URL alias {type}' module in 'Modules'. (admin/modules)
+2. Enable the 'Views URL alia' module in 'Modules'. (admin/modules)
 
 3. Create or view and select 'URL alias' for the field or filter
 
@@ -38,7 +38,7 @@ INSTALLATION
 NOTES
 -----
 
-- This module creates and maintains separate 'views_url_alias_{type}' tables
+- This module creates and maintains separate 'views_url_alias' table
   to provide clean and fast joins between the primary {type} table and its url
   aliases.
 
@@ -46,9 +46,7 @@ NOTES
 TODO
 ----
 
-- Support multiple path alias languages, which I have no experience doing.
-
-- Add support for taxonomy terms, users, etc URL aliases.
+- Support multiple path alias per content entity
 
 
 AUTHOR/MAINTAINER
