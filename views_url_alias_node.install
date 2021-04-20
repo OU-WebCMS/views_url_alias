@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * @file
+ * Installation information for the Views URL alias (node) module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function views_url_alias_node_install() {
+  // Set the weight to 2 so that this module executes after pathauto.
+  module_set_weight('views_url_alias_node', 2);
+  module_load_include('module', 'views_url_alias_node');
+  views_url_alias_node_rebuild();
+}
+
+/**
+ * Implements hook_schema().
+ */
+function views_url_alias_node_schema() {
+  return [
+    'views_url_alias_node' => [
+      'description' => t("A second url alias table for only node aliases used by views."),
+      'fields' => [
+        'nid' => [
+          'description' => 'The related {node}.nid for the url alias.',
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0
+        ],
+        'alias' => [
+          'description' => 'The alias for this path; e.g. title-of-the-story.',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => ''
+        ],
+      ],
+      'index' => [
+        'nid' => ['nid'],
+        'nid_alias' => ['nid', 'alias']
+      ],
+      'foreign keys' => [
+        'nid' => [
+          'table' => 'node',
+          'columns' => ['nid' => 'nid'],
+        ],
+      ],
+    ],
+  ];
+}
