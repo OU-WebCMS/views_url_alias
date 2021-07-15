@@ -1,5 +1,5 @@
 {
-    "name": "drupal/views_url_alias",
+    "name": "ou-webcms/views_url_alias",
     "description": "Allows node-related Views be filtered by path aliases.",
     "type": "drupal-module",
     "license": "GPL-2.0-or-later",
